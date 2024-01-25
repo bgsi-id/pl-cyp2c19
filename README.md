@@ -1,6 +1,6 @@
 # pl-cyp2c19
 ## Introduction
-Align nanopore reads to reference (CYP2C19 gene, form genome build 38), variant calling using Clair3, and adjust to make it compatible with Pharmcat, check for missing important sites in CYP2C19.
+Align nanopore reads to reference (CYP2C19 gene, from genome build 38), variant calling using Clair3, and adjust to make it compatible with Pharmcat, check for missing important sites in CYP2C19.
 
 ## Installation
 Install Dependencies
