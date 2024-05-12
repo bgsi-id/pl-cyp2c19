@@ -76,8 +76,8 @@ fi
 
 # Step 3
 echo "(3/4) Liftover to hg38"
-zcat $OUTPUT/clair3/merge_output.vcf.gz | awk 'BEGIN{OFS="\t"} {if ($1=="chr10:94762681-94855547") {$1="chr10"; $2+=94762680} print}' - > $OUTPUT/$SAMPLE.hg38.vcf
-zcat $OUTPUT/clair3/merge_output.gvcf.gz | awk 'BEGIN{OFS="\t"} {if ($1=="chr10:94762681-94855547") {$1="chr10"; $2+=94762680} print}' - > $OUTPUT/$SAMPLE.hg38.gvcf
+zcat $OUTPUT/clair3/merge_output.vcf.gz | awk 'BEGIN{OFS="\t"} {if ($1=="chr10:94761900-94855547") {$1="chr10"; $2+=94761899} print}' - > $OUTPUT/$SAMPLE.hg38.vcf
+zcat $OUTPUT/clair3/merge_output.gvcf.gz | awk 'BEGIN{OFS="\t"} {if ($1=="chr10:94761900-94855547") {$1="chr10"; $2+=94761899} print}' - > $OUTPUT/$SAMPLE.hg38.gvcf
 
 # Check the exit status of the previous command
 if [ $? -ne 0 ]; then

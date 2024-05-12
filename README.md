@@ -16,14 +16,14 @@ Download Reference
 ```
 wget ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz
 gunzip -d GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz
-samtools faidx GCA_000001405.15_GRCh38_no_alt_analysis_set.fna chr10:94762681-94855547 > GRCh38.cyp2c19.fa 
+samtools faidx GCA_000001405.15_GRCh38_no_alt_analysis_set.fna chr10:94761900-94855547 > GRCh38.cyp2c19.fa 
 samtools faidx GRCh38.cyp2c19.fa
 ```
 
 Download Clair3 Model
 ```
 ## see 'https://github.com/nanoporetech/rerio/tree/master/clair3_models' for full model
-wget https://cdn.oxfordnanoportal.com/software/analysis/models/clair3/r1041_e82_400bps_sup_v410.tar.gz
+wget https://cdn.oxfordnanoportal.com/software/analysis/models/clair3/r1041_e82_400bps_hac_v430.tar.gz
 tar -xvf r1041_e82_400bps_sup_v410.tar.gz
 ```
 ## Usage
