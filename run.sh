@@ -78,16 +78,16 @@ fi
 echo "(3/4) Liftover to hg38"
 
 rm -f header.txt body.txt && \
-samtools view -H $OUTPUT/$SAMPLE.bam | sed 's/SN:chr10:94761900-94855547/SN:chr10/' > header.txt && \
-samtools view $OUTPUT/$SAMPLE.bam | sed 's/chr10:94761900-94855547/chr10/' - | \
-awk -v shift=94761899 '$3 == "chr10" {OFS="\t"; $4 = $4 + shift} {print $0}' > body.txt && \
+samtools view -H $OUTPUT/$SAMPLE.bam | sed 's/SN:chr10:94757681-94855547/SN:chr10/' > header.txt && \
+samtools view $OUTPUT/$SAMPLE.bam | sed 's/chr10:94757681-94855547/chr10/' - | \
+awk -v shift=94757680 '$3 == "chr10" {OFS="\t"; $4 = $4 + shift} {print $0}' > body.txt && \
 cat body.txt >> header.txt && \
 samtools view -b header.txt > $OUTPUT/$SAMPLE.hg38.bam && \
 samtools index $OUTPUT/$SAMPLE.hg38.bam && \
 rm -f header.txt body.txt
 
-zcat $OUTPUT/clair3/merge_output.vcf.gz | awk 'BEGIN{OFS="\t"} {if ($1=="chr10:94761900-94855547") {$1="chr10"; $2+=94761899} print}' - > $OUTPUT/$SAMPLE.hg38.vcf
-zcat $OUTPUT/clair3/merge_output.gvcf.gz | awk 'BEGIN{OFS="\t"} {if ($1=="chr10:94761900-94855547") {$1="chr10"; $2+=94761899} print}' - > $OUTPUT/$SAMPLE.hg38.gvcf
+zcat $OUTPUT/clair3/merge_output.vcf.gz | awk 'BEGIN{OFS="\t"} {if ($1=="chr10:94757681-94855547") {$1="chr10"; $2+=94757680} print}' - > $OUTPUT/$SAMPLE.hg38.vcf
+zcat $OUTPUT/clair3/merge_output.gvcf.gz | awk 'BEGIN{OFS="\t"} {if ($1=="chr10:94757681-94855547") {$1="chr10"; $2+=94757680} print}' - > $OUTPUT/$SAMPLE.hg38.gvcf
 
 # Check the exit status of the previous command
 if [ $? -ne 0 ]; then
@@ -100,8 +100,8 @@ echo "(4/4) Checking variants"
 echo "CHR\tPOS\tDP" > $OUTPUT/$SAMPLE.depth.txt
 # Loop through the provided positions
 for position in \
-  "94761900" \
   "94761288" \
+  "94761900" \
   "94762656" \
   "94762693" \
   "94762706" \
