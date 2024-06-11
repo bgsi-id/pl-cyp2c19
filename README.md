@@ -12,12 +12,13 @@ conda create -n pl-cyp2c19 -c bioconda clair3 samtools minimap2 python=3.9.0 -y
 conda activate pl-cyp2c19
 ```
 
-Download Reference
+Download Reference and Region
 ```
 wget ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz
 gunzip -d GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz
 samtools faidx GCA_000001405.15_GRCh38_no_alt_analysis_set.fna chr10:94757681-94855547 > GRCh38.cyp2c19.fa 
 samtools faidx GRCh38.cyp2c19.fa
+wget https://raw.githubusercontent.com/bgsi-id/pl-cyp2c19/dev/static/region.bed
 ```
 
 Download Clair3 Model
@@ -29,22 +30,24 @@ tar -xvf r1041_e82_400bps_sup_v410.tar.gz
 ## Usage
 Run Pipeline
 ```
-bash run.sh \
+bash pl-cyp2c19/run.sh \
     -s sample \
     -f /dir/to/fastq \
     -r /reference.fa \
+    -b /region.bed
     -t 48 \
     -m /dir/to/model \
     -o /dir/output
 
 ## example
-# bash run.sh \
-#     -s barcode06 \
-#     -f /data/rspon/Batch_1/fastq_pass/barcode06 \
-#     -r /data/refs/GRCh38.cyp2c19.fa \
-#     -t 48 \
-#     -m /data/models/r1041_e82_400bps_sup_v410 \
-#     -o output-barcode06
+bash pl-cyp2c19/run.sh \
+    -s barcode06 \
+    -f /data/rspon/Batch_1/fastq_pass/barcode06 \
+    -r /data/refs/GRCh38.cyp2c19.fa \
+    -b /data/refs/region.bed
+    -t 48 \
+    -m /data/models/r1041_e82_400bps_sup_v410 \
+    -o output-barcode06
 ```
 
 Run Pharmcat
@@ -52,7 +55,7 @@ Run Pharmcat
 docker run -it -v `pwd`:/data pgkb/pharmcat /pharmcat/pharmcat_pipeline /data/sample.hg38.vcf -o /data/pcat
 
 ## example
-# docker run -it -v `pwd`:/data pgkb/pharmcat /pharmcat/pharmcat_pipeline /data/output-barcode06/barcode06.hg38.vcf -o /data/pcat
+docker run -it -v `pwd`:/data pgkb/pharmcat /pharmcat/pharmcat_pipeline /data/output-barcode06/barcode06.hg38.vcf -o /data/pcat
 ```
 
 
