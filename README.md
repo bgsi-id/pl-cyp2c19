@@ -25,7 +25,14 @@ wget https://cdn.oxfordnanoportal.com/software/analysis/models/clair3/r1041_e82_
 tar -xvf r1041_e82_400bps_hac_v410.tar.gz
 ```
 ## Usage
-Run Pipeline
+Run All Sample
+```
+bash pl-cyp2c19/run_analysis.sh \
+    /dir/to/fastq 
+    /dir/output
+``
+
+Run Single Sample
 ```
 bash pl-cyp2c19/run.sh \
     -s sample \
