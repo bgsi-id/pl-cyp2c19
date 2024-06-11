@@ -1,4 +1,4 @@
-while getopts ":s:t:f:r:m:o:" opt; do
+while getopts ":s:t:f:r:b:m:o:" opt; do
   case $opt in
     s)
       SAMPLE=$OPTARG
@@ -11,6 +11,9 @@ while getopts ":s:t:f:r:m:o:" opt; do
       ;;
     r)
       REF=$OPTARG
+      ;;
+    b)
+      BED=$OPTARG
       ;;
     m)
       MODEL=$OPTARG
@@ -30,7 +33,7 @@ while getopts ":s:t:f:r:m:o:" opt; do
 done
 
 echo "Checking environment ..."
-required_tools=("minimap2" "samtools" "run_clair3.sh")
+required_tools=("minimap2" "samtools" "run_clair3.sh" "bedtools" "create_report")
 
 for tool in "${required_tools[@]}"; do
     which "$tool" > /dev/null 2>&1
@@ -46,7 +49,19 @@ mkdir $OUTPUT
 
 # Step 1
 echo "(1/4) Mapping reads to reference"
-zcat $FASTQ/*.fastq.gz | minimap2 -ax map-ont $REF - | samtools sort - > $OUTPUT/$SAMPLE.bam && samtools index $OUTPUT/$SAMPLE.bam
+if ls $FASTQ/*.fastq.gz 1> /dev/null 2>&1; then
+    # Handle fastq.gz files
+    zcat $FASTQ/*.fastq.gz | minimap2 -ax map-ont $REF - | samtools sort -o $OUTPUT/$SAMPLE.bam -
+elif ls $FASTQ/*.fastq 1> /dev/null 2>&1; then
+    # Handle fastq files
+    samtools fastq $FASTQ/*.fastq | minimap2 -ax map-ont $REF - | samtools sort -o $OUTPUT/$SAMPLE.bam -
+#elif ls $FASTQ_DIR/*.bam 1> /dev/null 2>&1; then
+#    # Handle BAM files by converting to FASTQ
+#    samtools fastq $FASTQ_DIR/*.bam | minimap2 -ax map-ont $REF - | samtools sort -o $OUTPUT_DIR/$SAMPLE.bam -
+else
+    echo "No fastq, fastq.gz, or bam files found in $FASTQ_DIR"
+exit 1
+fi
 
 # Check the exit status of the previous command
 if [ $? -ne 0 ]; then
@@ -55,7 +70,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Step 2
-echo "(2/4) Variant calling"
+echo "(2/5) Variant calling"
 run_clair3.sh \
   --bam_fn=$OUTPUT/$SAMPLE.bam \
   --ref_fn=$REF \
@@ -75,7 +90,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Step 3
-echo "(3/4) Liftover to hg38"
+echo "(3/5) Liftover to hg38"
 
 rm -f header.txt body.txt && \
 samtools view -H $OUTPUT/$SAMPLE.bam | sed 's/SN:chr10:94757681-94855547/SN:chr10/' > header.txt && \
@@ -96,62 +111,16 @@ if [ $? -ne 0 ]; then
 fi
 
 # Step 4
-echo "(4/4) Checking variants"
-echo "CHR\tPOS\tDP" > $OUTPUT/$SAMPLE.depth.txt
-# Loop through the provided positions
-for position in \
-  "94761288" \
-  "94761900" \
-  "94762656" \
-  "94762693" \
-  "94762706" \
-  "94762712" \
-  "94762715" \
-  "94762755" \
-  "94762760" \
-  "94762788" \
-  "94762856" \
-  "94775106" \
-  "94775121" \
-  "94775160" \
-  "94775185" \
-  "94775367" \
-  "94775416" \
-  "94775423" \
-  "94775453" \
-  "94775489" \
-  "94775507" \
-  "94780574" \
-  "94780579" \
-  "94780653" \
-  "94781858" \
-  "94781859" \
-  "94781944" \
-  "94781999" \
-  "94842861" \
-  "94842866" \
-  "94842879" \
-  "94842995" \
-  "94849995" \
-  "94852738" \
-  "94852765" \
-  "94852785" \
-  "94852914"
+echo "(4/5) Checking variants"
+bedtools coverage -a $BED -b $OUTPUT/$SAMPLE.hg38.bam > $OUTPUT/$SAMPLE.depth.txt -d
 
-do
-  # Extract depth from VCF for the given position
-  depth=$(grep $position $OUTPUT/$SAMPLE.hg38.gvcf | awk '{print $10}' | awk -F':' '{print $3}')
-  #Print result
-  if [ -n "$depth" ]; then
-    echo -e "chr10\t$position\t$depth" >> $OUTPUT/$SAMPLE.depth.txt
-  else
-    echo -e "chr10\t$position\tNo depth" >> $OUTPUT/$SAMPLE.depth.txt
-  fi
-done
+echo "(5/5) Generating report"
 
-if [ $? -ne 0 ]; then
-    echo "Error in liftover to hg38. Exiting."
-    exit 1
-fi
+CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+create_report $BED \
+    --genome hg38 \
+    --flanking 1000 \
+    --tracks $OUTPUT/$SAMPLE.hg38.vcf $OUTPUT/$SAMPLE.hg38.bam \
+    --output $OUTPUT/$SAMPLE.igv.html
 
 echo "Complete!"
