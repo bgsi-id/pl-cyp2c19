@@ -28,9 +28,9 @@ tar -xvf r1041_e82_400bps_hac_v410.tar.gz
 Run All Sample
 ```
 bash pl-cyp2c19/run_analysis.sh \
-    /dir/to/fastq 
+    /dir/to/folder \
     /dir/output
-``
+```
 
 Run Single Sample
 ```
