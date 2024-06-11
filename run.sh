@@ -51,10 +51,10 @@ mkdir $OUTPUT
 echo "(1/4) Mapping reads to reference"
 if ls $FASTQ/*.fastq.gz 1> /dev/null 2>&1; then
     # Handle fastq.gz files
-    zcat $FASTQ/*.fastq.gz | minimap2 -ax map-ont $REF - | samtools sort -o $OUTPUT/$SAMPLE.bam -
+    zcat $FASTQ/*.fastq.gz | minimap2 -ax map-ont $REF - | samtools sort -o $OUTPUT/$SAMPLE.bam - && samtools index $OUTPUT/$SAMPLE.bam
 elif ls $FASTQ/*.fastq 1> /dev/null 2>&1; then
     # Handle fastq files
-    samtools fastq $FASTQ/*.fastq | minimap2 -ax map-ont $REF - | samtools sort -o $OUTPUT/$SAMPLE.bam -
+    samtools fastq $FASTQ/*.fastq | minimap2 -ax map-ont $REF - | samtools sort -o $OUTPUT/$SAMPLE.bam - && samtools index $OUTPUT/$SAMPLE.bam
 #elif ls $FASTQ_DIR/*.bam 1> /dev/null 2>&1; then
 #    # Handle BAM files by converting to FASTQ
 #    samtools fastq $FASTQ_DIR/*.bam | minimap2 -ax map-ont $REF - | samtools sort -o $OUTPUT_DIR/$SAMPLE.bam -
