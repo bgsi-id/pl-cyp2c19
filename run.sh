@@ -33,7 +33,7 @@ while getopts ":s:t:f:r:b:m:o:" opt; do
 done
 
 echo "Checking environment ..."
-required_tools=("minimap2" "samtools" "run_clair3.sh" "bedtools" "create_report")
+required_tools=("minimap2" "samtools" "run_clair3.sh" "bedtools" "create_report" "docker")
 
 for tool in "${required_tools[@]}"; do
     which "$tool" > /dev/null 2>&1
@@ -45,10 +45,20 @@ for tool in "${required_tools[@]}"; do
     fi
 done
 
+#Check if the required Docker image exists locally
+required_image="pgkb/pharmcat"
+docker images -q $required_image > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    echo "- Docker image $required_image is available."
+else
+    echo "- Docker image $required_image is not available."
+    exit 1
+fi
+
 mkdir $OUTPUT
 
 # Step 1
-echo "(1/4) Mapping reads to reference"
+echo "(1/6) Mapping reads to reference"
 if ls $FASTQ/*.fastq.gz 1> /dev/null 2>&1; then
     # Handle fastq.gz files
     zcat $FASTQ/*.fastq.gz | minimap2 -ax map-ont $REF - | samtools sort -o $OUTPUT/$SAMPLE.bam - && samtools index $OUTPUT/$SAMPLE.bam
@@ -70,7 +80,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Step 2
-echo "(2/5) Variant calling"
+echo "(2/6) Variant calling"
 run_clair3.sh \
   --bam_fn=$OUTPUT/$SAMPLE.bam \
   --ref_fn=$REF \
@@ -90,7 +100,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Step 3
-echo "(3/5) Liftover to hg38"
+echo "(3/6) Liftover to hg38"
 
 rm -f header.txt body.txt && \
 samtools view -H $OUTPUT/$SAMPLE.bam | sed 's/SN:chr10:94757681-94855547/SN:chr10/' > header.txt && \
@@ -111,10 +121,10 @@ if [ $? -ne 0 ]; then
 fi
 
 # Step 4
-echo "(4/5) Checking variants"
+echo "(4/6) Checking variants"
 bedtools coverage -a $BED -b $OUTPUT/$SAMPLE.hg38.bam > $OUTPUT/$SAMPLE.depth.txt -d
 
-echo "(5/5) Generating report"
+echo "(5/6) Generating report"
 
 CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 create_report $BED \
@@ -122,5 +132,10 @@ create_report $BED \
     --flanking 1000 \
     --tracks $OUTPUT/$SAMPLE.hg38.vcf $OUTPUT/$SAMPLE.hg38.bam \
     --output $OUTPUT/$SAMPLE.igv.html
+
+# Step 5
+echo "(6/6) Annotating with PharmCat"
+
+docker run --rm -v $OUTPUT:/pharmcat/data pgkb/pharmcat ./pharmcat_pipeline data/$SAMPLE.hg38.vcf -o /pharmcat/data/pharmcat_out
 
 echo "Complete!"

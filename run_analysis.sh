@@ -6,11 +6,16 @@ if [ -z "$1" ] || [ -z "$2" ]; then
   exit 1
 fi
 
-INPUT_ROOT=$1
-OUTPUT_ROOT=$2
+# Get absolute paths of the input and output directories
+INPUT_ROOT=$(readlink -f "$1")
+OUTPUT_ROOT=$(readlink -f "$2")
 
 # Create the output root directory if it doesn't exist
 mkdir -p "$OUTPUT_ROOT"
+
+# Activate the Conda environment
+source /home/rtriwijaya/miniforge3/etc/profile.d/conda.sh
+conda activate pl-cyp2c19
 
 # Iterate over each folder in the input root directory
 for INPUT_FOLDER in "$INPUT_ROOT"/*; do
@@ -27,7 +32,7 @@ for INPUT_FOLDER in "$INPUT_ROOT"/*; do
       -f "$INPUT_FOLDER" \
       -r pl-cyp2c19/static/GRCh38.cyp2c19.fa \
       -b pl-cyp2c19/static/region.bed \
-      -m r1041_e82_400bps_hac_v430 \
+      -m reference/r1041_e82_400bps_hac_v430 \
       -t 48 \
       -o "$OUTPUT_FOLDER"
   fi
