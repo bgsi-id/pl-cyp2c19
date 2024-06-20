@@ -89,6 +89,7 @@ Run Multiple Samples
 Input Directory Structure
 
 The following is the structure of the `input_directory` directory:
+```
 input_directory/
 ├── sample1/
 │   ├── sample1_file1.fastq
@@ -99,6 +100,7 @@ input_directory/
 └── sample3/
     ├── sample3_file1.fastq
     └── sample3_file2.fastq.gz
+```
 
 Then, run the script in command line:
 ```
