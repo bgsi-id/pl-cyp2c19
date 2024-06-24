@@ -52,7 +52,7 @@ Then, run the script in command line:
 nextflow run pl-cyp2c19-RT/pl-cyp2c19.nf --input_dir path/to/input_directory --ref path/to/reference.fa --threads 12 --model path/to/clair3_model --bed path/to/region.bed  --output output_folder
 
 # For example:
-~/nextflow run pl-cyp2c19-RT/pl-cyp2c19.nf --input_dir example_input_directory --ref pl-cyp2c19-RT/static/GRCh38.cyp2c19.fa --threads 12 --model r1041_e82_400bps_hac_v430 --bed pl-cyp2c19-RT/static/region.bed  --output pl-cyp2c19_output
+nextflow run pl-cyp2c19-RT/pl-cyp2c19.nf --input_dir example_input_directory --ref pl-cyp2c19-RT/static/GRCh38.cyp2c19.fa --threads 12 --model r1041_e82_400bps_hac_v430 --bed pl-cyp2c19-RT/static/region.bed  --output pl-cyp2c19_output
 ```
 
 
