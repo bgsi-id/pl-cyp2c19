@@ -32,4 +32,5 @@ sdk install java 17.0.6-amzn
 cd $HOME
 wget -qO- https://get.nextflow.io | bash
 chmod +x nextflow
+sudo mv nextflow /usr/local/bin
 
