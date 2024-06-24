@@ -18,7 +18,7 @@ Download Clair3 Model
 ```
 ## see 'https://github.com/nanoporetech/rerio/tree/master/clair3_models' for full model
 wget https://cdn.oxfordnanoportal.com/software/analysis/models/clair3/r1041_e82_400bps_hac_v430.tar.gz
-tar -xvf r1041_e82_400bps_hac_v410.tar.gz
+tar -xvf r1041_e82_400bps_hac_v430.tar.gz
 ```
 
 Build docker image
