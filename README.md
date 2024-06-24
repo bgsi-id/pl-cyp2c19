@@ -23,8 +23,8 @@ tar -xvf r1041_e82_400bps_hac_v430.tar.gz
 
 Build docker image
 ```
-docker build -f Dockerfile --target image1 -t pl-cyp2c19-image:latest .
-docker build -f Dockerfile --target pharmcat_image -t pgkb/pharmcat:latest .
+docker build -f pl-cyp2c19-RT/Dockerfile --target image1 -t pl-cyp2c19-image:latest .
+docker build -f pl-cyp2c19-RT/Dockerfile --target pharmcat_image -t pgkb/pharmcat:latest .
 ```
 
 ## Usage
