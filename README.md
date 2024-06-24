@@ -29,7 +29,6 @@ docker build -f Dockerfile --target pharmcat_image -t pgkb/pharmcat:latest .
 
 ## Usage
 
-```
 Input Directory Structure
 
 The following is the structure of the `input_directory` directory:
