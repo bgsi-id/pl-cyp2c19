@@ -29,8 +29,10 @@ process alignmentProcess {
         zcat ${input_dir}/*.fastq.gz | minimap2 -ax map-ont ${ref} - | samtools sort -o "${input_dir}.bam" - && samtools index "${input_dir}.bam"
     elif ls ${input_dir}/*.fastq 1> /dev/null 2>&1; then
         samtools fastq ${input_dir}/*.fastq | minimap2 -ax map-ont ${ref} - | samtools sort -o "${input_dir}.bam" - && samtools index "${input_dir}.bam"
+    elif ls ${input_dir}/*.bam 1> /dev/null 2>&1; then
+        samtools fastq ${input_dir}/*.bam | minimap2 -ax map-ont ${ref} - | samtools sort -o "${input_dir}.bam" - && samtools index "${input_dir}.bam"
     else
-        echo "No fastq or fastq.gz files found in ${input_dir}"
+        echo "No fastq, fastq.gz or bam files found in ${input_dir}"
         exit 1
     fi
     """
