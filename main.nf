@@ -15,6 +15,7 @@ input_ch = Channel.fromPath("${params.input_dir}/*", type:'dir')
 // Processes
 process alignmentProcess {
     publishDir "$params.output/$input_dir"
+
     input:
     path input_dir
     path ref
@@ -133,13 +134,10 @@ process creating_igvReport {
 
     script:
     """
-    bgzip -c ${vcf_hg38} > ${vcf_hg38}.gz
-    tabix ${vcf_hg38}.gz
-
     create_report ${bed} \
         --genome hg38 \
         --flanking 1000 \
-        --tracks ${vcf_hg38}.gz ${bam_hg38} \
+        --tracks ${vcf_hg38} ${bam_hg38} \
         --output "${bam_hg38.simpleName}.igv.html"
     """
 }
