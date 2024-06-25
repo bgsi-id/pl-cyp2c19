@@ -2,7 +2,7 @@
 
 ## Introduction
 
-**pl-cyp2c19** is a workflow for detecting variants and generating pharmacogenomics data in the CYP2C19 gene panel.
+**pl-cyp2c19** is a workflow for detecting variants and generating pharmacogenomics (PGx) report for a nanopore CYP2C19 gene panel.
 
 The pipeline can currently perform the following:
 
