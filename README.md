@@ -18,15 +18,13 @@ The pipeline can currently perform the following:
 Download source and reference
 
 ```
-wget https://github.com/bgsi-id/pl-cyp2c19/archive/refs/heads/dev.zip
-unzip dev.zip
-rm dev.zip
+git clone https://github.com/bgsi-id/pl-cyp2c19.git 
 ```
 
-Install docker and nextflow
+Install docker, java, and nextflow
 
 ```
-bash pl-cyp2c19-dev/setup.sh
+bash pl-cyp2c19/setup.sh
 ```
 
 Download Clair3 Model
@@ -73,10 +71,10 @@ nextflow run bgsi-id/pl-cyp2c19 \
 nextflow run bgsi-id/pl-cyp2c19 \ 
     -r 1.0.0 \
     --input_dir example_input_directory \
-    --ref pl-cyp2c19-dev/static/GRCh38.cyp2c19.fa \
+    --ref pl-cyp2c19/static/GRCh38.cyp2c19.fa \
     --threads 12 \
     --model r1041_e82_400bps_hac_v430 \
-    --bed pl-cyp2c19-dev/static/region.bed  \
+    --bed pl-cyp2c19/static/region.bed  \
     --output pl-cyp2c19_output
 ```
 
