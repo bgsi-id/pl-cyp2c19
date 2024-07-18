@@ -1,0 +1,52 @@
+{
+  "name": "",
+  "homePage": "",
+  "repos": {
+    "https://github.com/nf-core/modules.git": {
+      "modules": {
+        "nf-core": {
+          "bcftools/annotate": {
+            "branch": "master",
+            "git_sha": "c1a7fa1c038061b344f2a41be71942061ec40d2e",
+            "installed_by": ["modules"]
+          },
+          "bcftools/norm": {
+            "branch": "master",
+            "git_sha": "33ef773a7ea36e88323902f63662aa53c9b88988",
+            "installed_by": ["modules"]
+          },
+          "bedtools/coverage": {
+            "branch": "master",
+            "git_sha": "1d1cb7bfef6cf67fbc7faafa6992ad8bdc3045b3",
+            "installed_by": ["modules"]
+          },
+          "igvreports": {
+            "branch": "master",
+            "git_sha": "c62ff4610d88d2a0a4f25b8e2c2188476d08aed4",
+            "installed_by": ["modules"]
+          },
+          "minimap2/align": {
+            "branch": "master",
+            "git_sha": "e83b347b3e674de6bb1bb7bdf9b2674768c8e0fe",
+            "installed_by": ["modules"]
+          },
+          "samtools/fastq": {
+            "branch": "master",
+            "git_sha": "04fbbc7c43cebc0b95d5b126f6d9fe4effa33519",
+            "installed_by": ["modules"]
+          },
+          "samtools/index": {
+            "branch": "master",
+            "git_sha": "04fbbc7c43cebc0b95d5b126f6d9fe4effa33519",
+            "installed_by": ["modules"]
+          },
+          "samtools/sort": {
+            "branch": "master",
+            "git_sha": "04fbbc7c43cebc0b95d5b126f6d9fe4effa33519",
+            "installed_by": ["modules"]
+          }
+        }
+      }
+    }
+  }
+}
