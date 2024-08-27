@@ -1,42 +1,31 @@
-# pl-cyp2c19
+# pgkb-hwgs
 
 ## Introduction
 
-**pl-cyp2c19** is a workflow for detecting variants and generating pharmacogenomics (PGx) report for a nanopore CYP2C19 gene panel.
+**pgkb-hwgs** is an alternative guideline to generate pharmacogenomics report from a targeted CYP2C19 gene panel VCF.
 
 The pipeline can currently perform the following:
 
-- Align nanopore reads to CYP2C19 reference gene 
-- Variant calling using Clair3
-- Adjust coordinate to genome build 38
-- Check for missing important sites in CYP2C19
-- Generate variant report using IGV Report
+- Phase VCF based on reference
 - Generate pharmacogenomics report using PharmCAT
+
+## Steps
+
+- Separate multiallelic variants to different rows in VCF using bcftools.
+- Phase the input VCF with filtered 1000Genomes VCF as reference using Eagle. The reference VCF is obtained from (http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/) and filtered on region chr10:94761288-9485291.
+- Run the PharmCAT installed in docker.
+  
+## Prerequisites
+Install docker
+Install conda
 
 ## Installation
 
-Download source and reference
+Download and install Eagle_v2.4.1 https://alkesgroup.broadinstitute.org/Eagle/downloads/Eagle_v2.4.1.tar.gz
+Install PharmCAT with docker https://pharmcat.org/using/PharmCAT-in-Docker/
+Install bcftools in a Conda environment
 
-```
-git clone https://github.com/bgsi-id/pl-cyp2c19.git 
-```
-
-Install docker, java, and nextflow
-
-```
-bash pl-cyp2c19/setup.sh
-```
-
-Download Clair3 Model
-
-```
-## see 'https://github.com/nanoporetech/rerio/tree/master/clair3_models' for full model
-wget https://cdn.oxfordnanoportal.com/software/analysis/models/clair3/r1041_e82_400bps_hac_v430.tar.gz
-tar -xvf r1041_e82_400bps_hac_v430.tar.gz
-rm r1041_e82_400bps_hac_v430.tar.gz
-```
-
-## Usage
+## Commands
 
 Input Directory Structure
 
@@ -44,39 +33,63 @@ The following is the structure of the `input_directory` directory:
 
 ```
 example_input_directory/
-├── sample1/
-│   ├── sample1_file1.fastq
-│   └── sample1_file2.fastq
-├── sample2/
-│   ├── sample2_file1.fastq.gz
-│   └── sample2_file2.fastq.gz
-└── sample3/
-    ├── sample3_file1.bam
-    └── sample3_file2.bam
+├── sample1.vcf.gz
+├── sample2.vcf.gz
+├── sample3.vcf.gz
+└──...
 ```
 
-Then, run the script in command line:
+1. Declare input and activate environment
 
 ```
-nextflow run bgsi-id/pl-cyp2c19 \ 
-    -r 1.0.0 \
-    -input_dir path/to/input_directory \ 
-    --ref path/to/reference.fa \
-    --threads 12 \
-    --model path/to/clair3_model \
-    --bed path/to/region.bed  \
-    --output output_folder
+INPUT_DIR="/home/$USER/input_vcf_dir"
+VCF_REF="$HOME/Eagle_v2.4.1/ALL_chr10_phase3_cyp2c19.vcf.gz"
+GENETIC_MAP="$HOME/Eagle_v2.4.1/tables/genetic_map_hg38_withX.txt.gz"
+OUT_DIR="$HOME/output_pharmcat_hwgs"
 
-# FOR EXAMPLE
-nextflow run bgsi-id/pl-cyp2c19 \ 
-    -r 1.0.0 \
-    --input_dir example_input_directory \
-    --ref pl-cyp2c19/static/GRCh38.cyp2c19.fa \
-    --threads 12 \
-    --model r1041_e82_400bps_hac_v430 \
-    --bed pl-cyp2c19/static/region.bed  \
-    --output pl-cyp2c19_output
+# Set up memory usage limit 
+ulimit -v 8097152
+
+# Create the output directory
+mkdir -p $OUT_DIR
+
+# Activate environment installed with bcftools
+conda activate bcftools
 ```
+
+2. Phasing and pharmcat
+
+```
+# Run the bcftools, Eagle, and pharmCAT
+
+for i in $(ls $INPUT_DIR/*vcf.gz); do \
+    id=$(basename $i .vcf.gz) ;\
+    mkdir -p "$OUT_DIR"/"$id" ;\
+    #handle multiallelic rows in vcf
+    bcftools norm -m -any $i -o $OUT_DIR/"$id"/"$id"_mono.vcf.gz ;\
+    
+    #index input vcf
+    tabix $OUT_DIR/"$id"/"$id"_mono.vcf.gz ;\
+    
+    #phasing input vcf based on available reference
+    $HOME/Eagle_v2.4.1/eagle --vcfTarget $OUT_DIR/"$id"/"$id"_mono.vcf.gz \
+        --outPrefix="$OUT_DIR"/"$id"/"$id" \
+        --geneticMapFile $GENETIC_MAP \
+        --chrom chr10 \
+        --vcfRef $VCF_REF \
+        --numThreads 8 \
+        --outputUnphased ;\
+    
+    mv "$OUT_DIR"/"$id"/"$id".unphased.vcf.gz "$OUT_DIR"/"$id"/"$id".vcf.gz;\
+    rm $OUT_DIR/"$id"/*_mono.vcf.gz*  ;\
+
+    #running pharmcat
+    docker run --rm -v $OUT_DIR/"$id":/pharmcat/data pgkb/pharmcat ./pharmcat_pipeline /pharmcat/data/"$id".vcf.gz -o /pharmcat/data/"$id"/ ;\
+    rm $OUT_DIR/*.vcf.gz ;\
+    done
+```
+
+
 
 ## Disclaimer
 
