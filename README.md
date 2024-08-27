@@ -16,13 +16,16 @@ The pipeline can currently perform the following:
 - Run the PharmCAT installed in docker.
   
 ## Prerequisites
-Install docker
-Install conda
+Install docker.
+
+Install conda.
 
 ## Installation
 
-Download and install Eagle_v2.4.1 https://alkesgroup.broadinstitute.org/Eagle/downloads/Eagle_v2.4.1.tar.gz
-Install PharmCAT with docker https://pharmcat.org/using/PharmCAT-in-Docker/
+Download and install Eagle_v2.4.1 (https://alkesgroup.broadinstitute.org/Eagle/downloads/Eagle_v2.4.1.tar.gz)
+
+Install PharmCAT with docker (https://pharmcat.org/using/PharmCAT-in-Docker/)
+
 Install bcftools in a Conda environment
 
 ## Commands
