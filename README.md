@@ -2,7 +2,7 @@
 
 ## Introduction
 
-**pgkb-hwgs** is an alternative guideline to generate pharmacogenomics report from a targeted CYP2C19 gene panel VCF.
+**pgkb-hwgs** is a guideline to generate pharmacogenomics report from a targeted CYP2C19 gene panel VCF.
 
 The pipeline can currently perform the following:
 
