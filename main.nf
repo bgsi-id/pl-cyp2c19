@@ -82,7 +82,7 @@ process variantCalling {
 process liftoverToHg38 {
     // publishDir "${params.output}/${bam.simpleName}"
     publishDir "${params.output}/${bam.simpleName}", saveAs: { file -> 
-    file.getName().endsWith('.hg38.gvcf') || file.getName().endsWith('.hg38.bam') ? file.getName() : null
+        return (file.endsWith('.hg38.gvcf') || file.endsWith('.hg38.bam')) ? file : null
     }
     input:
     path bam
