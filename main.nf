@@ -80,7 +80,9 @@ process variantCalling {
 }
 
 process liftoverToHg38 {
-    publishDir "${params.output}/${bam.simpleName}"
+    publishDir "${params.output}/${bam.simpleName}", saveAs: { file -> 
+        return (file.endsWith('.hg38.gvcf') || file.endsWith('.hg38.bam')) ? file : null
+    }
     input:
     path bam
     path vcf
@@ -105,6 +107,21 @@ process liftoverToHg38 {
     zcat ${gvcf} | awk 'BEGIN{OFS="\\t"} {if (\$1=="chr10:94757681-94855547") {\$1="chr10"; \$2+=94757680} print}' - > "${bam.simpleName}.hg38.gvcf"
 
     echo "Completed liftover for BAM: ${bam.simpleName}.hg38.bam VCF: ${bam.simpleName}.hg38.vcf GVCF: ${bam.simpleName}.hg38.gvcf"
+    """
+}
+
+process rename_contig {
+    publishDir "${params.output}/${vcf_hg38.simpleName}"
+
+    input:
+    path vcf_hg38
+
+    output:
+    path("${vcf_hg38.simpleName}.vcf"), emit: vcf
+
+    script:
+    """
+    sed -E 's/(##contig=<ID=chr[^,:]+):[^,]+(,length=[0-9]+>)/\\1\\2/' ${vcf_hg38} > ${vcf_hg38.simpleName}.vcf
     """
 }
 
@@ -159,7 +176,6 @@ process running_pharmcat {
     rm ${vcf_hg38.baseName}.2.vcf
     pharmcat_pipeline ${vcf_hg38} -o pharmcat_out
     """
-    //docker run --rm -v ./:/pharmcat/data pgkb/pharmcat ./pharmcat_pipeline /pharmcat/data/${vcf_hg38} -o /pharmcat/data/pharmcat_out
 }
 
 // Workflow definition
@@ -191,7 +207,9 @@ workflow {
     bam_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.bam') } }
     vcf_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.vcf') } }
     bam_hg38_index_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.bam.bai') } }
-    // gvcf_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.gvcf') } }
+
+    //Rename contig
+    rename_contig(vcf_hg38_ch)
 
     // Calculate coverage depth from BAM file
     calculating_bamCoverage(bam_hg38_ch, bed_ch)
@@ -200,5 +218,5 @@ workflow {
     creating_igvReport(bed_ch, vcf_hg38_ch, bam_hg38_ch, bam_hg38_index_ch)
 
     // Generate pharmcat report
-    running_pharmcat(vcf_hg38_ch)
+    running_pharmcat(rename_contig.out.vcf)
 }
