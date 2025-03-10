@@ -122,7 +122,7 @@ process rename_contig {
 
     script:
     """
-    sed -E 's/(##contig=<ID=chr[^,:]+):[^,]+(,length=[0-9]+>)/\1\2/' ${vcf_hg38} > ${vcf_hg38.simpleName}.vcf
+    sed -E 's/(##contig=<ID=chr[^,:]+):[^,]+(,length=[0-9]+>)/\1\2/' ${vcf_hg38} > "${vcf_hg38.simpleName}.vcf"
     """
 }
 
