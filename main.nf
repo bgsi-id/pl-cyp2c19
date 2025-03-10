@@ -80,7 +80,14 @@ process variantCalling {
 }
 
 process liftoverToHg38 {
-    publishDir "${params.output}/${bam.simpleName}"
+    // publishDir "${params.output}/${bam.simpleName}"
+    publishDir "${params.output}/${bam.simpleName}", saveAs: { file -> 
+        if (file.name.endsWith('.hg38.gvcf') || file.name.endsWith('.hg38.bam')) {
+            return file.name  // Only publish BAM and gVCF files
+        } else {
+            return null  // Keep other files in the work directory
+        }
+    }
     input:
     path bam
     path vcf
@@ -101,10 +108,25 @@ process liftoverToHg38 {
     samtools index "${bam.simpleName}.hg38.bam" && \
     rm -f header.txt body.txt
 
-    zcat ${vcf} | sed -E 's/(##contig=<ID=chr[^,:]+):[^,]+(,length=[0-9]+>)/\1\2/'  - > "${bam.simpleName}.hg38.vcf"
-    zcat ${gvcf} | sed -E 's/(##contig=<ID=chr[^,:]+):[^,]+(,length=[0-9]+>)/\1\2/'  - > "${bam.simpleName}.hg38.gvcf"
+    zcat ${vcf} | awk 'BEGIN{OFS="\\t"} {if (\$1=="chr10:94757681-94855547") {\$1="chr10"; \$2+=94757680} print}' - > "${bam.simpleName}.hg38.vcf"
+    zcat ${gvcf} | awk 'BEGIN{OFS="\\t"} {if (\$1=="chr10:94757681-94855547") {\$1="chr10"; \$2+=94757680} print}' - > "${bam.simpleName}.hg38.gvcf"
 
     echo "Completed liftover for BAM: ${bam.simpleName}.hg38.bam VCF: ${bam.simpleName}.hg38.vcf GVCF: ${bam.simpleName}.hg38.gvcf"
+    """
+}
+
+process rename_contig {
+    publishDir "${params.output}/${vcf_hg38.simpleName}"
+
+    input:
+    path vcf_hg38
+
+    output:
+    path("${vcf_hg38.simpleName}.hg38.vcf")
+
+    script:
+    """
+    sed -E 's/(##contig=<ID=chr[^,:]+):[^,]+(,length=[0-9]+>)/\1\2/' ${vcf_hg38} > ${vcf_hg38.simpleName}.hg38.vcf
     """
 }
 
@@ -192,6 +214,9 @@ workflow {
     vcf_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.vcf') } }
     bam_hg38_index_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.bam.bai') } }
     // gvcf_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.gvcf') } }
+
+    //Rename contig
+    rename_contig(hg38_files_ch.out.vcf_file_ch)
 
     // Calculate coverage depth from BAM file
     calculating_bamCoverage(bam_hg38_ch, bed_ch)
