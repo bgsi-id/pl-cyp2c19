@@ -216,7 +216,7 @@ workflow {
     // gvcf_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.gvcf') } }
 
     //Rename contig
-    rename_contig(hg38_files_ch.out.vcf_file_ch)
+    rename_contig(vcf_hg38_ch)
 
     // Calculate coverage depth from BAM file
     calculating_bamCoverage(bam_hg38_ch, bed_ch)
