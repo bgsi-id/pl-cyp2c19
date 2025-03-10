@@ -80,10 +80,9 @@ process variantCalling {
 }
 
 process liftoverToHg38 {
-    publishDir "${params.output}/${bam.simpleName}"
-    // publishDir "${params.output}/${bam.simpleName}", saveAs: { file -> 
-    //     return (file.endsWith('.hg38.gvcf') || file.endsWith('.hg38.bam')) ? file : null
-    // }
+    publishDir "${params.output}/${bam.simpleName}", saveAs: { file -> 
+        return (file.endsWith('.hg38.gvcf') || file.endsWith('.hg38.bam')) ? file : null
+    }
     input:
     path bam
     path vcf
@@ -118,7 +117,7 @@ process rename_contig {
     path vcf_hg38
 
     output:
-    path("${vcf_hg38.simpleName}.vcf")
+    path("${vcf_hg38.simpleName}.vcf"), emit: vcf
 
     script:
     """
@@ -221,5 +220,5 @@ workflow {
     creating_igvReport(bed_ch, vcf_hg38_ch, bam_hg38_ch, bam_hg38_index_ch)
 
     // Generate pharmcat report
-    running_pharmcat(vcf_hg38_ch)
+    running_pharmcat(rename_contig.out.vcf)
 }
