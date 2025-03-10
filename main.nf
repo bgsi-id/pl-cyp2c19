@@ -111,20 +111,20 @@ process liftoverToHg38 {
     """
 }
 
-process rename_contig {
-    publishDir "${params.output}/${vcf_hg38.simpleName}"
+// process rename_contig {
+//     publishDir "${params.output}/${vcf_hg38.simpleName}"
 
-    input:
-    path vcf_hg38
+//     input:
+//     path vcf_hg38
 
-    output:
-    path("${vcf_hg38.simpleName}.vcf")
+//     output:
+//     path("${vcf_hg38.simpleName}.vcf")
 
-    script:
-    """
-    sed -E 's/(##contig=<ID=chr[^,:]+):[^,]+(,length=[0-9]+>)/\1\2/' ${vcf_hg38} > ${vcf_hg38.simpleName}.vcf
-    """
-}
+//     script:
+//     """
+//     sed -E 's/(##contig=<ID=chr[^,:]+):[^,]+(,length=[0-9]+>)/\1\2/' ${vcf_hg38} > ${vcf_hg38.simpleName}.vcf
+//     """
+// }
 
 process calculating_bamCoverage {
     publishDir "${params.output}/${bam_hg38.simpleName}"
@@ -212,7 +212,7 @@ workflow {
     // gvcf_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.gvcf') } }
 
     //Rename contig
-    rename_contig(vcf_hg38_ch)
+    // rename_contig(vcf_hg38_ch)
 
     // Calculate coverage depth from BAM file
     calculating_bamCoverage(bam_hg38_ch, bed_ch)
