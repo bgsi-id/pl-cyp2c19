@@ -118,11 +118,11 @@ process rename_contig {
     path vcf_hg38
 
     output:
-    path("${vcf_hg38.simpleName}.hg38.vcf")
+    path("${vcf_hg38.simpleName}.vcf")
 
     script:
     """
-    sed -E 's/(##contig=<ID=chr[^,:]+):[^,]+(,length=[0-9]+>)/\1\2/' ${vcf_hg38} > ${vcf_hg38.simpleName}.hg38.vcf
+    sed -E 's/(##contig=<ID=chr[^,:]+):[^,]+(,length=[0-9]+>)/\1\2/' ${vcf_hg38} > ${vcf_hg38.simpleName}.vcf
     """
 }
 
