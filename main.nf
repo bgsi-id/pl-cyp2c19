@@ -101,8 +101,8 @@ process liftoverToHg38 {
     samtools index "${bam.simpleName}.hg38.bam" && \
     rm -f header.txt body.txt
 
-    zcat ${vcf} | awk 'BEGIN{OFS="\\t"} {if (\$1=="chr10:94757681-94855547") {\$1="chr10"; \$2+=94757680} print}' - > "${bam.simpleName}.hg38.vcf"
-    zcat ${gvcf} | awk 'BEGIN{OFS="\\t"} {if (\$1=="chr10:94757681-94855547") {\$1="chr10"; \$2+=94757680} print}' - > "${bam.simpleName}.hg38.gvcf"
+    zcat ${vcf} | sed -E 's/(##contig=<ID=chr[^,:]+):[^,]+(,length=[0-9]+>)/\1\2/'  - > "${bam.simpleName}.hg38.vcf"
+    zcat ${gvcf} | sed -E 's/(##contig=<ID=chr[^,:]+):[^,]+(,length=[0-9]+>)/\1\2/'  - > "${bam.simpleName}.hg38.gvcf"
 
     echo "Completed liftover for BAM: ${bam.simpleName}.hg38.bam VCF: ${bam.simpleName}.hg38.vcf GVCF: ${bam.simpleName}.hg38.gvcf"
     """
