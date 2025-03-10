@@ -90,7 +90,7 @@ process liftoverToHg38 {
     path gvcf
 
     output:
-    tuple path("${bam.simpleName}.hg38.bam"), path("${bam.simpleName}.hg38.vcf"), emit:vcf, path("${bam.simpleName}.hg38.gvcf"), path("${bam.simpleName}.hg38.bam.bai")
+    tuple path("${bam.simpleName}.hg38.bam"), path("${bam.simpleName}.hg38.vcf"), path("${bam.simpleName}.hg38.gvcf"), path("${bam.simpleName}.hg38.bam.bai")
 
     script:
     """
@@ -207,12 +207,12 @@ workflow {
     // Liftover to hg38
     hg38_files_ch = liftoverToHg38(bam_file_ch, vcf_file_ch, gvcf_file_ch)
     bam_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.bam') } }
-    // vcf_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.vcf') } }
+    vcf_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.vcf') } }
     bam_hg38_index_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.bam.bai') } }
     // gvcf_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.gvcf') } }
 
     //Rename contig
-    rename_contig(hg38_files_ch.out.vcf)
+    rename_contig(vcf_hg38_ch)
 
     // Calculate coverage depth from BAM file
     calculating_bamCoverage(bam_hg38_ch, bed_ch)
@@ -221,5 +221,5 @@ workflow {
     creating_igvReport(bed_ch, vcf_hg38_ch, bam_hg38_ch, bam_hg38_index_ch)
 
     // Generate pharmcat report
-    running_pharmcat(hg38_files_ch.out.vcf)
+    running_pharmcat(vcf_hg38_ch)
 }
