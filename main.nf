@@ -176,7 +176,6 @@ process running_pharmcat {
     rm ${vcf_hg38.baseName}.2.vcf
     pharmcat_pipeline ${vcf_hg38} -o pharmcat_out
     """
-    //docker run --rm -v ./:/pharmcat/data pgkb/pharmcat ./pharmcat_pipeline /pharmcat/data/${vcf_hg38} -o /pharmcat/data/pharmcat_out
 }
 
 // Workflow definition
@@ -208,7 +207,6 @@ workflow {
     bam_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.bam') } }
     vcf_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.vcf') } }
     bam_hg38_index_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.bam.bai') } }
-    // gvcf_hg38_ch = hg38_files_ch.map { it -> it.findAll { file -> file.name.endsWith('.hg38.gvcf') } }
 
     //Rename contig
     rename_contig(vcf_hg38_ch)
