@@ -36,6 +36,13 @@ tar -xvf r1041_e82_400bps_hac_v430.tar.gz
 rm r1041_e82_400bps_hac_v430.tar.gz
 ```
 
+To update a workflow to the latest version on the command line use the following command:
+
+```
+nextflow pull https://github.com/bgsi-id/pl-cyp2c19.git -r main
+```
+
+
 ## Usage
 
 Input Directory Structure
